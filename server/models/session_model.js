@@ -9,7 +9,7 @@ const list = new Schema({
         type: Number,
         default: null
     },
-    desciption: {
+    description: {
         type: String,
         default: null
     }

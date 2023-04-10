@@ -1,7 +1,7 @@
-import React, {useState} from 'react';   // for create-react-app, etc
+import React, {useState} from 'react';  
 import { useEffect } from 'react';
+import { useNavigate} from "react-router-dom";
 import axios from 'axios'
-import Thanks from './Thanks';
 
 function StarRating({
     count, 
@@ -39,34 +39,37 @@ function StarRating({
 }
 
 
-function Rating({outOf, question, count}) {
+function Rating({outOf,count, question}) {
+  const navigate = useNavigate()
 
-  const [rating, setRating] = useState(0);
-  const [survey, setSurvey] = useState([])
   const [showButton, setShowButton] = useState(true)
   const [track, setTrack ] = useState([])
-  const [post, setPost ] = useState(false)
-  const [description, setDescription] = useState(null);
-  const [showThanks, setShowThanks] = useState(false);
 
-  const thanks =  JSON.parse(localStorage.getItem('survey'));
-
+  const [rating, setRating] = useState(0);
+  const [description,setDescription] = useState(null)
+  const [answerList, setAnswerList] = useState([])
   useEffect(() => {
-   
     setRating(0)
   }, [count])
-
-  useEffect(() => {
-    track[count] && track[count].submit === true ? setShowButton(false) : setShowButton(true)
-    thanks && setShowThanks(true)
-    thanks && setTimeout(() => {
-      localStorage.setItem('survey','false')
-      localStorage.setItem('welcome','true')
-      setShowThanks(false)
-    }, 5000);
-  })
   
-  useEffect(() => {
+  useEffect(()=>{
+    track[count] && track[count].submit === true ? setShowButton(false) : setShowButton(true)
+  })
+  const onDescription=(e)=>{
+    setDescription(e.target.value)
+  }
+  
+
+  const handleChange = (value) => {
+    setRating(value); 
+  }
+
+  const submitAnwser = ()=>{
+    setAnswerList([...answerList, {question: question, rating: rating, description: description}])
+    setTrack([...track, { count: count, submit: true }])
+  }
+
+  const storeData = ()=>{
 
     let axiosConfig = {
       headers: {
@@ -75,9 +78,9 @@ function Rating({outOf, question, count}) {
       }
     };
 
-    post && axios
+    axios
     .post(`http://localhost:7000/api/session/add-session`,{
-      survey: survey
+      survey: answerList
     },
     axiosConfig
     )
@@ -86,46 +89,31 @@ function Rating({outOf, question, count}) {
     }).catch(error => {
       console.log(error);
     });
-   
-  }, [post])
+
+
+    navigate('/thanking')
+  }
   
- 
-  
-  const onChangeDescription=(e)=>{
-    setDescription(e.target.value)
-  }
-
-  const handleChange = (value) => {
-    setRating(value);
-  }
-
-  const submit=()=>{
-    setSurvey([{question: question,rating: rating, description: description, submitted: true},...survey])
-    setTrack([...track, { count: count, submit: true }])
-  }
-
-  const dataStore=()=>{
-    setPost(true)
-    localStorage.setItem('survey', true);
-  }
-
   return (<>
-           {outOf != null ? <div>
-                <StarRating 
+            <div>
+              <div className="question-container">{question}</div>
+        
+               {outOf !==null ? <StarRating 
                 count={outOf}
                 size={40}
                 value={rating}
                 activeColor ={'red'}
                 inactiveColor={'#ddd'}
                 onChange={handleChange}  
-                />
-              </div>: 
-              <input type='text' onChange={(e)=>onChangeDescription(e)}/>}
-             {showButton && <button className='button shift' onClick={()=>submit()}>Submit</button>}
-             <button className='button add left' onClick={()=>dataStore()}> Submit Survey</button>
-
-             {thanks && <Thanks/>}
-          </>)
+                />:
+                <input type='text' onChange={(e)=>onDescription(e)}/>}
+              </div>
+              
+             {showButton && <button onClick={submitAnwser} className='button shift'>Submit</button>}
+              <button onClick={storeData} className='button add left'>StoreResult</button>
+          </>
+   
+  )
 }
 
 export default Rating

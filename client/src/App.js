@@ -1,41 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import './App.css';
-import Question from './Components/Question';
-import Thanks from './Components/Thanks';
-import Welcome from './Components/Welcome';
+import React from 'react'
+import { BrowserRouter, Routes, Route, redirect } from "react-router-dom";
+import Survey from './Pages/Survey';
+import Thanking from './Pages/Thanking';
+import Welcome from './Pages/Welcome';
+import './App.css'
 
 function App() {
 
-  const [showWelcome, setShowWelcome] = useState(true)  
-  let welcome = JSON.parse(localStorage.getItem('welcome'))
- 
 
-  useEffect(() => {
-    welcome && setShowWelcome(true)
-
-  }, [welcome])
-  
-
-  
-
-  
-  const startSurvey=()=>{
-    setShowWelcome(false)
-    localStorage.setItem('welcome','false')
-  }
-  
-  
 
   return (
-   
-            <>
-            {showWelcome ? <Welcome/> : <Question/>}
-            {showWelcome && <div  className='lower-container'>
-                        <button className='button' onClick={startSurvey}>Start</button>
-                      </div>}
-            </>
-
-  );
+   <>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Welcome/>}/>
+        <Route path="/survey" element={<Survey/>}/>
+        <Route path="/thanking" element={<Thanking/>}/>
+         
+      </Routes>
+    </BrowserRouter>
+   </>
+  )
 }
 
-export default App;
+export default App
