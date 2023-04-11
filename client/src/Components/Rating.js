@@ -1,4 +1,4 @@
-import React, {useState} from 'react';  
+import React, {useState, useImperativeHandle} from 'react';  
 import { useEffect } from 'react';
 import { useNavigate} from "react-router-dom";
 import axios from 'axios'
@@ -39,7 +39,8 @@ function StarRating({
 }
 
 
-function Rating({outOf,count, question}) {
+const Rating = React.forwardRef(({outOf,count, question, list}, ref) => {
+// function Rating({outOf,count, question, list},ref) {
   const navigate = useNavigate()
 
   const [showButton, setShowButton] = useState(true)
@@ -48,8 +49,12 @@ function Rating({outOf,count, question}) {
   const [rating, setRating] = useState(0);
   const [description,setDescription] = useState(null)
   const [answerList, setAnswerList] = useState([])
+
+  const [ratingList,setRatingList] = useState([])
+  
   useEffect(() => {
-    setRating(0)
+    //  setRating(rating) 
+    ratingList.length > 0 ? setRating(ratingList[count]) : setRating(0)
   }, [count])
   
   useEffect(()=>{
@@ -64,10 +69,20 @@ function Rating({outOf,count, question}) {
     setRating(value); 
   }
 
-  const submitAnwser = ()=>{
-    setAnswerList([...answerList, {question: question, rating: rating, description: description}])
-    setTrack([...track, { count: count, submit: true }])
-  }
+   const submitAnwser = ()=>{
+    
+      setAnswerList([...answerList, {question: question, rating: rating, description: description, marked: rating}])
+      setTrack([...track, { count: count, submit: true }])
+      setRatingList([...ratingList,rating])
+    }
+
+
+    useImperativeHandle(ref, 
+      () => ({
+          submitAnwser
+    }))
+
+ 
 
   const storeData = ()=>{
 
@@ -102,19 +117,19 @@ function Rating({outOf,count, question}) {
                 count={outOf}
                 size={40}
                 value={rating}
-                activeColor ={'red'}
+                activeColor ={'#004488'}
                 inactiveColor={'#ddd'}
                 onChange={handleChange}  
                 />:
                 <input type='text' onChange={(e)=>onDescription(e)}/>}
               </div>
               
-             {showButton && <button onClick={submitAnwser} className='button shift'>Submit</button>}
+             {/* {showButton && <button onClick={submitAnwser} className='button shift'>Submit</button>} */}
               <button onClick={storeData} className='button add left'>StoreResult</button>
           </>
    
   )
-}
+})
 
 export default Rating
  

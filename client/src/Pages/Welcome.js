@@ -14,14 +14,12 @@ const Welcome = () => {
     }
 
   return (<>
-    <div className='upper-container'>
-        Welcome
-       
-    </div>
-    <div className='lower-container'>
-         <button className='button' onClick={start}>Start</button>
-    </div>
-
+            <div className='upper-container'>
+                Welcome
+            </div>
+            <div className='lower-container'>
+                <button className='button' onClick={start}>Start</button>
+            </div>
         </>
     
   )

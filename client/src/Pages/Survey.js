@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect,useRef } from 'react'
 import { useNavigate} from "react-router-dom";
 import Rating from '../Components/Rating';
 
@@ -6,27 +6,32 @@ const Questions= [
     {
         question: 'How satisfied are you with our products?',
         rating: '5',
-        description: null
+        description: null,
+        marked: 0
     },
     {
         question: 'How fair are the prices compared to similar retailers?',
         rating: '5',
-        description: null
+        description: null,
+        marked: 0
     },
     {
         question: 'How satisfied are you with the value for money of your purchase?',
         rating: '5',
-        description: null
+        description: null,
+        marked: 0
     },
     {
         question: 'On a scale of 1-10 how would you recommend us to your friends and family?',
         rating: '10',
-        description: null
+        description: null,
+        marked: 0
     },
     {
         question: 'What could we do to improve our service?',
         rating: null,
-        description: 1
+        description: 1,
+        marked: 0
     },
 ]
 
@@ -40,6 +45,8 @@ const Survey = () => {
     const [newQuestion, setNewQuestion] = useState('')
     const [newRating, setRating] = useState(null)
     const [newDescription, setNewDescription] = useState(null)
+   
+    const childRef = useRef();
 
     useEffect(() => {    
         doneSurvey && navigate('/thanking')
@@ -50,6 +57,7 @@ const Survey = () => {
     }
     const next = ()=>{
       count < list.length - 1 &&  setCount(count + 1)
+      childRef.current.submitAnwser()
     }
     const addTrigger = ()=>{
         setShowTextBox(true)
@@ -67,7 +75,7 @@ const Survey = () => {
          setNewDescription(e.target.value)
     }
     const add = ()=>{
-        setList([...list,{question:newQuestion,rating: newRating,description: newDescription }])
+        setList([...list,{question:newQuestion,rating: newRating,description: newDescription, marked: 0 }])
         setShowTextBox(false)
     }
  
@@ -77,7 +85,7 @@ const Survey = () => {
         <div className='queue'>
                 {count+1}/{list.length}
         </div>
-        <Rating outOf={list[count].rating} count={count} question={list[count].question}/>
+        <Rating outOf={list[count].rating} count={count} question={list[count].question} list={list} ref={childRef}/> 
         {!showTextBox && <button onClick={addTrigger} className='button add right'>Add Question</button>}
         {showTextBox && <input type='text' onChange={(e)=>onChangeQuestion(e)} placeholder="Enter Question"/>}
         {showTextBox && <input type='number' onChange={(e)=>onChangeRating(e)} placeholder="Enter Rating"/>}
@@ -88,6 +96,7 @@ const Survey = () => {
     <div className='lower-container'>
         <button onClick={prev} className='button'>Prev</button>
         <button onClick={next} className='button'>Next</button>
+        {/* <button onClick={() => childRef.current.submitAnwser()} className='button'>Next</button> */}
     </div>
     </>
    
